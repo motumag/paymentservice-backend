@@ -21,7 +21,6 @@ import org.springframework.web.client.RestTemplate;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -63,15 +62,19 @@ public class EbirrServiceImpl implements EbirrService {
     @Override
     public EbirrPaymentResponse createEbirrTransaction(EbirrRequestDto ebirrRequestDto) {
         try {
-            if (paymentRepository.existsByOrderId(ebirrRequestDto.getRequestId())) {
+            if (!paymentCategoryRepository.existsByPaymentCategoryCodeAndPaymentSourceNameIgnoreCase(
+                    ebirrRequestDto.getPaymentServiceCode(),
+                    ebirrRequestDto.getPaymentSourceName())) {
+                throw new RuntimeException("Please, check your paymentCategoryCode and PaymentSourceName");
+            }
+            if (paymentRepository.existsByOrderId(
+                    ebirrRequestDto.getRequestId())) {
                 throw new RuntimeException("Duplicate order, transaction is already exist");
             }
-            if (!paymentCategoryRepository
-                    .existsByPaymentCategoryCodeIgnoreCase(ebirrRequestDto.getPaymentServiceCode())) {
-                throw new RuntimeException("There is No such type of payment type");
-            }
-            if (!paymentCategoryRepository.existsByPaymentSourceNameIgnoreCase(ebirrRequestDto.getPaymentSourceName())) {
-                throw new RuntimeException("Please make sure your source is registered");
+            if (paymentRepository.existsByReferenceIdOrInvoiceIdIgnoreCase(
+                    ebirrRequestDto.getReferenceId(),
+                    ebirrRequestDto.getInvoiceId())) {
+                throw new RuntimeException("Duplicate referenceId or invoiceId is not allowed");
             }
             CurrentLoggedInUser currentLoggedInUser = new CurrentLoggedInUser();
             Payment paymentDb = new Payment();
