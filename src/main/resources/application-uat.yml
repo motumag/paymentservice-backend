@@ -1,0 +1,40 @@
+#UAT Database configuration
+POSTGRES_SQL_USERNAME: pservicecore
+POSTGRES_SQL_PASSWORD: pservicedb
+POSTGRES_SQL_HOST: 10.1.178.22
+POSTGRES_SQL_PORT: 5432
+POSTGRES_SQL_DB: pservicedb
+
+#Server port
+SERVER_PORT: 9094
+ACTIVE_PROFILE: uat
+
+# for ssl keys
+KEY_STORE_PASSWORD: qazwsx@123
+KEY_ALIAS: paymentservice
+KEY_PASSWORD: qazwsx@123
+
+#Ebirr configuration
+EBIRR:
+  url: https://testpayments.ebirr.com/asm
+  schemaVersion: 1.0
+  channelName: WEB
+  serviceName: API_PURCHASE
+  merchantUid: M1040033
+  paymentMethod: MWALLET_ACCOUNT
+  apiKey: API-10618773
+  apiUserId: 10000008
+  currency: ETB
+  description: ebirr-payment
+#For OTP Configuration
+SEND_OTP:
+  serviceCode: PHE006
+  channel: USSD
+  Service_name: PhoneEnquiryService
+#Appconnect Endpoints
+APPCONNECT_URL:
+  phoneEnqByAccNo: http://10.1.245.150:7081/v1/cbo/
+  otpUrl: http://10.1.245.150:7081/v1/otp/send
+
+COOP_INTERNAL:
+  coopFtUrl: http://10.1.245.150:7081/v1/cbo/

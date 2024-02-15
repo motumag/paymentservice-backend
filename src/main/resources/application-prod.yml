@@ -1,0 +1,30 @@
+#LocalDB
+POSTGRES_SQL_USERNAME: postgres
+POSTGRES_SQL_PASSWORD: nana@123
+POSTGRES_SQL_HOST: localhost
+POSTGRES_SQL_PORT: 5432
+POSTGRES_SQL_DB: pservicedb
+
+#Server
+SERVER_PORT: 9094
+ACTIVE_PROFILE: prod
+
+KEY_STORE_PASSWORD: qazwsx@123
+KEY_ALIAS: paymentservice
+KEY_PASSWORD: qazwsx@123
+
+EBIRR:
+  url: https://testpayments.ebirr.com/asm
+  schemaVersion: 1.0
+  channelName: WEB
+  serviceName: API_PURCHASE
+  merchantUid: M1040033
+  paymentMethod: MWALLET_ACCOUNT
+  apiKey: API-10618773
+  apiUserId: 10000008
+  currency: ETB
+  description: ebirr-payment
+
+
+COOP_INTERNAL:
+  coopFtUrl: http://10.1.245.150:7081/v1/cbo/

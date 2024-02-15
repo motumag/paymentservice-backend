@@ -1,0 +1,66 @@
+spring:
+  profiles:
+    active: ${ACTIVE_PROFILE:uat}
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_SQL_HOST}:${POSTGRES_SQL_PORT}/${POSTGRES_SQL_DB}
+    username: ${POSTGRES_SQL_USERNAME}
+    password: ${POSTGRES_SQL_PASSWORD}
+  jpa:
+    generate-ddl: true
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+        globally_quoted_identifiers: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  application:
+    name: PaymentServices
+
+server:
+  port: ${SERVER_PORT:8080}
+  ssl:
+    key-store: classpath:paymentcoopkeystore.jks
+    key-store-password: ${KEY_STORE_PASSWORD}
+    key-alias: ${KEY_ALIAS}
+    key-password: ${KEY_PASSWORD}
+
+
+#Ebirr constant values and configuration
+EBIRR_CONFIG:
+  url: ${EBIRR.url}
+  schemaVersion: ${EBIRR.schemaVersion}
+  channelName: ${EBIRR.channelName}
+  serviceName: ${EBIRR.serviceName}
+  merchantUid: ${EBIRR.merchantUid}
+  paymentMethod: ${EBIRR.paymentMethod}
+  apiKey: ${EBIRR.apiKey}
+  apiUserId: ${EBIRR.apiUserId}
+  currency: ${EBIRR.currency}
+  description: ${EBIRR.description}
+
+# OTP Configuration
+SEND_OTP_CONFIG:
+  serviceCode: ${SEND_OTP.serviceCode}
+  channel: ${SEND_OTP.channel}
+  Service_name: ${SEND_OTP.Service_name}
+
+ACE:
+  sendOtpUrl: ${APPCONNECT_URL.otpUrl}
+  phoneByAccount: ${APPCONNECT_URL.phoneEnqByAccNo}
+
+COOP_INTERNAL_FT:
+  coopFtUrl: ${COOP_INTERNAL.coopFtUrl}
+
+
+epassbook:
+  app:
+    jwtSecret: AF4CD92506BFBD44D97751C70A736ABD
+    jwtExpirationMs: 86400000
+
+jwt:
+  expirationDateInMs: 0
+  refreshTokenDurationMs: 9000000
