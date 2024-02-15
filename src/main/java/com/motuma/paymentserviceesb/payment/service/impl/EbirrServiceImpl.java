@@ -168,12 +168,14 @@ public class EbirrServiceImpl implements EbirrService {
                                 .status(HttpStatus.OK)
                                 .statusCode(HttpStatus.OK.value())
                                 .state(state)
-                                .transactionTime(txnTime);
+                                .transactionTime(txnTime)
+                                .transactionId(transactionResult.getParams().getTransactionId())
+                                .issuerTransactionId(transactionResult.getParams().getIssuerTransactionId())
+                                .referenceId(transactionResult.getParams().getReferenceId());
                     } else {
                         paymentDb.setEbirrRejectedOrderId(transactionResult.getParams().getOrderId());
                         paymentDb.setErrorDescription(transactionResult.getParams().getDescription());
                         paymentRepository.save(paymentDb);
-
                         builder.message("Ebirr payment STATE is not approved")
                                 .rejectedOrderId(transactionResult.getParams().getOrderId())
                                 .description(transactionResult.getParams().getDescription());

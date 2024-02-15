@@ -25,6 +25,7 @@ public class EbirrPaymentResponse {
     private String state;
     private String description;
     private String rejectedOrderId;
+    private String referenceId;
 
 
 
