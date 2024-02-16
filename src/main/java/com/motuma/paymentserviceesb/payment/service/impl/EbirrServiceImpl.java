@@ -21,7 +21,6 @@ import org.springframework.web.client.RestTemplate;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -63,15 +62,19 @@ public class EbirrServiceImpl implements EbirrService {
     @Override
     public EbirrPaymentResponse createEbirrTransaction(EbirrRequestDto ebirrRequestDto) {
         try {
-            if (paymentRepository.existsByOrderId(ebirrRequestDto.getRequestId())) {
+            if (!paymentCategoryRepository.existsByPaymentCategoryCodeAndPaymentSourceNameIgnoreCase(
+                    ebirrRequestDto.getPaymentServiceCode(),
+                    ebirrRequestDto.getPaymentSourceName())) {
+                throw new RuntimeException("Please, check your paymentCategoryCode and PaymentSourceName");
+            }
+            if (paymentRepository.existsByOrderId(
+                    ebirrRequestDto.getRequestId())) {
                 throw new RuntimeException("Duplicate order, transaction is already exist");
             }
-            if (!paymentCategoryRepository
-                    .existsByPaymentCategoryCodeIgnoreCase(ebirrRequestDto.getPaymentServiceCode())) {
-                throw new RuntimeException("There is No such type of payment type");
-            }
-            if (!paymentCategoryRepository.existsByPaymentSourceNameIgnoreCase(ebirrRequestDto.getPaymentSourceName())) {
-                throw new RuntimeException("Please make sure your source is registered");
+            if (paymentRepository.existsByReferenceIdOrInvoiceIdIgnoreCase(
+                    ebirrRequestDto.getReferenceId(),
+                    ebirrRequestDto.getInvoiceId())) {
+                throw new RuntimeException("Duplicate referenceId or invoiceId is not allowed");
             }
             CurrentLoggedInUser currentLoggedInUser = new CurrentLoggedInUser();
             Payment paymentDb = new Payment();
@@ -80,6 +83,8 @@ public class EbirrServiceImpl implements EbirrService {
             String timestampValue = currentDateTime.format(formatter);
             //save the request to db here
             paymentDb.setOrderId(ebirrRequestDto.getRequestId());
+            paymentDb.setReferenceId(ebirrRequestDto.getReferenceId());
+            paymentDb.setInvoiceId(ebirrRequestDto.getInvoiceId());
             paymentDb.setTimestamp(timestampValue);
             paymentDb.setDebitAccountNumber(ebirrRequestDto.getDebitAccountNumber());
             paymentDb.setCreditAccountNumber(merchantUid);
@@ -165,12 +170,14 @@ public class EbirrServiceImpl implements EbirrService {
                                 .status(HttpStatus.OK)
                                 .statusCode(HttpStatus.OK.value())
                                 .state(state)
-                                .transactionTime(txnTime);
+                                .transactionTime(txnTime)
+                                .transactionId(transactionResult.getParams().getTransactionId())
+                                .issuerTransactionId(transactionResult.getParams().getIssuerTransactionId())
+                                .referenceId(transactionResult.getParams().getReferenceId());
                     } else {
                         paymentDb.setEbirrRejectedOrderId(transactionResult.getParams().getOrderId());
                         paymentDb.setErrorDescription(transactionResult.getParams().getDescription());
                         paymentRepository.save(paymentDb);
-
                         builder.message("Ebirr payment STATE is not approved")
                                 .rejectedOrderId(transactionResult.getParams().getOrderId())
                                 .description(transactionResult.getParams().getDescription());

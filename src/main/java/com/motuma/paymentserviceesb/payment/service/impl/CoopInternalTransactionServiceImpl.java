@@ -45,11 +45,10 @@ public class CoopInternalTransactionServiceImpl implements CoopInternalTransacti
             if (paymentRepository.existsByOrderId(coopRequest.getOfsMessageId())) {
                 throw new RuntimeException("Transaction already exist with this messageId");
             }
-            if (!paymentCategoryRepository.existsByPaymentCategoryCodeIgnoreCase(coopRequest.getPaymentMethodCode())) {
-                throw new RuntimeException("There is no such kind of payment Method");
-            }
-            if (!paymentCategoryRepository.existsByPaymentSourceNameIgnoreCase(coopRequest.getPaymentSourceName())) {
-                throw new RuntimeException("Please make sure your source is registered");
+            if (!paymentCategoryRepository.existsByPaymentCategoryCodeAndPaymentSourceNameIgnoreCase(
+                    coopRequest.getPaymentMethodCode(),
+                    coopRequest.getPaymentSourceName())) {
+                throw new RuntimeException("Please, check your paymentCategoryCode and PaymentSourceName");
             }
             OtpSend otpSendConfirmation = sendOtpRepository.findOtpSendsByOtpNumberIgnoreCase(coopRequest.getOtpNumber());
 
@@ -86,7 +85,6 @@ public class CoopInternalTransactionServiceImpl implements CoopInternalTransacti
             coopPaymentDb.setOrderId(coopRequest.getOfsMessageId());
             coopPaymentDb.setTimestamp(timestampValue);
             coopPaymentDb.setDebitAccountNumber(coopRequest.getDebitAccountNumber());
-            coopPaymentDb.setCreditAccountNumber(coopRequest.getCreditAccountNumber());
             coopPaymentDb.setAmount(coopRequest.getDebitAmount());
             coopPaymentDb.setPaymentMethod("COOP_FT");
             coopPaymentDb.setPaymentServiceCode(coopRequest.getPaymentMethodCode());
@@ -155,6 +153,7 @@ public class CoopInternalTransactionServiceImpl implements CoopInternalTransacti
                     coopPaymentDb.setTransactionId(fundTransferType.getString("id"));
                     coopPaymentDb.setIssuerTransactionId(statusObject.getString("transactionId"));
                     coopPaymentDb.setStatus(statusObject.getString("successIndicator"));
+                    coopPaymentDb.setCreditAccountNumber(statusObject.getString("CREDITACCTNO"));
                     coopPaymentDb.setPaymentCompletionTime(fundTransferType.getString("PROCESSINGDATE"));
                     paymentRepository.save(coopPaymentDb);
 //                    Build the success response body
@@ -168,7 +167,7 @@ public class CoopInternalTransactionServiceImpl implements CoopInternalTransacti
                 }
             } else {
                 coopPaymentDb.setResponseCode(esbStatus.getString("responseCode"));
-                coopPaymentDb.setErrorDescription(esbStatus.getString("errorType"));
+                coopPaymentDb.setErrorCode(esbStatus.getString("errorType"));
                 coopPaymentDb.setStatus(esbStatus.getString("Status"));
                 paymentRepository.save(coopPaymentDb);
 
@@ -183,6 +182,9 @@ public class CoopInternalTransactionServiceImpl implements CoopInternalTransacti
                     List<String> errorDescriptions = errorDescriptionArray.toList().stream()
                             .map(Object::toString)
                             .collect(Collectors.toList());
+                    String firstErrorDescription = errorDescriptionArray.getString(0);
+                    coopPaymentDb.setErrorDescription(firstErrorDescription);
+                    paymentRepository.save(coopPaymentDb);
                     builder.errorDescription(errorDescriptions);
                 } else {
                     builder.errorDescription(Collections.emptyList());

@@ -29,7 +29,10 @@ public class PaymentCategoryServiceImp implements PaymentCategoryService {
     public PaymentCategoryResponse createPaymentCategory(PaymentCategoryDto paymentCategoryDto) {
        try {
            if(paymentCategoryRepository
-                   .existsByPaymentCategoryCodeIgnoreCase(paymentCategoryDto.getPaymentCategoryCode())){
+                   .existsByPaymentCategoryCodeAndPaymentSourceNameIgnoreCase(
+                           paymentCategoryDto.getPaymentCategoryCode(),
+                           paymentCategoryDto.getPaymentCategoryCode()
+                           )){
                throw new RuntimeException("Payment Category exist by this code");
            }
            PaymentCategory paymentCategory=new PaymentCategory();
