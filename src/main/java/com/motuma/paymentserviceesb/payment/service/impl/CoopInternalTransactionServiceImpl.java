@@ -85,7 +85,6 @@ public class CoopInternalTransactionServiceImpl implements CoopInternalTransacti
             coopPaymentDb.setOrderId(coopRequest.getOfsMessageId());
             coopPaymentDb.setTimestamp(timestampValue);
             coopPaymentDb.setDebitAccountNumber(coopRequest.getDebitAccountNumber());
-            coopPaymentDb.setCreditAccountNumber(coopRequest.getCreditAccountNumber());
             coopPaymentDb.setAmount(coopRequest.getDebitAmount());
             coopPaymentDb.setPaymentMethod("COOP_FT");
             coopPaymentDb.setPaymentServiceCode(coopRequest.getPaymentMethodCode());
@@ -154,6 +153,7 @@ public class CoopInternalTransactionServiceImpl implements CoopInternalTransacti
                     coopPaymentDb.setTransactionId(fundTransferType.getString("id"));
                     coopPaymentDb.setIssuerTransactionId(statusObject.getString("transactionId"));
                     coopPaymentDb.setStatus(statusObject.getString("successIndicator"));
+                    coopPaymentDb.setCreditAccountNumber(statusObject.getString("CREDITACCTNO"));
                     coopPaymentDb.setPaymentCompletionTime(fundTransferType.getString("PROCESSINGDATE"));
                     paymentRepository.save(coopPaymentDb);
 //                    Build the success response body

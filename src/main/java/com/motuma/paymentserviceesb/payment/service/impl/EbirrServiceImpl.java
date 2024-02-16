@@ -83,6 +83,8 @@ public class EbirrServiceImpl implements EbirrService {
             String timestampValue = currentDateTime.format(formatter);
             //save the request to db here
             paymentDb.setOrderId(ebirrRequestDto.getRequestId());
+            paymentDb.setReferenceId(ebirrRequestDto.getReferenceId());
+            paymentDb.setInvoiceId(ebirrRequestDto.getInvoiceId());
             paymentDb.setTimestamp(timestampValue);
             paymentDb.setDebitAccountNumber(ebirrRequestDto.getDebitAccountNumber());
             paymentDb.setCreditAccountNumber(merchantUid);

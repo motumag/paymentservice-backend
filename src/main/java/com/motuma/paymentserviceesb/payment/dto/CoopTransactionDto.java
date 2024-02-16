@@ -27,8 +27,8 @@ private String serviceCode;
    @NotNull(message = "debitAmount is required")
    @NotBlank(message = "debitAmount is required")
    private String debitAmount;
-   @NotNull(message = "creditAccountNumber should not be empty")
-   @NotBlank(message = "creditAccountNumber should not be empty")
+//   @NotNull(message = "creditAccountNumber should not be empty")
+//   @NotBlank(message = "creditAccountNumber should not be empty")
    private String creditAccountNumber;
    @NotNull(message = "debitAccountNumber should not be empty")
    @NotBlank(message = "debitAccountNumber should not be empty")
