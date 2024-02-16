@@ -74,6 +74,7 @@ public class OtpSendServiceImpl implements OtpSendService {
                 if (statusObject.has("successIndicator") && statusObject.getString("successIndicator").equals("Success")) {
                     String phoneNumberForOtp = phoneEnquiryResponse.getString("PhoneNumber");
                     String otpUrl = sendOtpUrl;
+                    System.out.println("the otp url is: "+otpUrl);
                     JSONObject mobileTextRequest = new JSONObject();
                     String generatedOtpNumber = generateAndRegisterOtp();
                     mobileTextRequest.put("Mobile", phoneNumberForOtp);
@@ -86,6 +87,7 @@ public class OtpSendServiceImpl implements OtpSendService {
                     HttpEntity<String> requestEntityOtp = new HttpEntity<>(mobileTextRequest.toString(), headers);
                     ResponseEntity<String> otpResponse = restTemplate.exchange(otpUrl, HttpMethod.POST, requestEntityOtp, String.class);
                     String otpResponseBody = otpResponse.getBody();
+                    System.out.println("Otp resp body: "+otpResponseBody);
 
                     JSONObject otpResponseObject = new JSONObject(otpResponseBody);
                     if (otpResponseObject.has("status")) {

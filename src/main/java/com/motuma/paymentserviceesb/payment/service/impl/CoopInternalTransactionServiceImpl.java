@@ -134,6 +134,7 @@ public class CoopInternalTransactionServiceImpl implements CoopInternalTransacti
             ResponseEntity<String> responseEntity = restTemplate.exchange(ftUrl, HttpMethod.POST, requestEntityCoopFt, String.class);
 
             String responseBody = responseEntity.getBody();
+            System.out.println("response body is: "+responseBody);
             JSONObject jsonObject = new JSONObject(responseBody);
             CoopInternalTransactionResponse.CoopInternalTransactionResponseBuilder builder = CoopInternalTransactionResponse.builder();
             JSONObject paymentServiceResponse = jsonObject.getJSONObject("PaymentServiceResponse");
@@ -153,7 +154,7 @@ public class CoopInternalTransactionServiceImpl implements CoopInternalTransacti
                     coopPaymentDb.setTransactionId(fundTransferType.getString("id"));
                     coopPaymentDb.setIssuerTransactionId(statusObject.getString("transactionId"));
                     coopPaymentDb.setStatus(statusObject.getString("successIndicator"));
-                    coopPaymentDb.setCreditAccountNumber(statusObject.getString("CREDITACCTNO"));
+                    coopPaymentDb.setCreditAccountNumber(fundTransferType.getString("CREDITACCTNO"));
                     coopPaymentDb.setPaymentCompletionTime(fundTransferType.getString("PROCESSINGDATE"));
                     paymentRepository.save(coopPaymentDb);
 //                    Build the success response body

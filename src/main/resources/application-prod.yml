@@ -28,7 +28,7 @@ EBIRR:
   description: ebirr-payment
 #For OTP Configuration
 SEND_OTP:
-  serviceCode: PHE006
+  serviceCode: 960000
   channel: USSD
   Service_name: PhoneEnquiryService
 #Appconnect Endpoints
