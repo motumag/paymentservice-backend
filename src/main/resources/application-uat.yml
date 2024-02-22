@@ -35,6 +35,7 @@ SEND_OTP:
 APPCONNECT_URL:
   phoneEnqByAccNo: http://10.1.245.150:7081/v1/cbo/
   otpUrl: http://10.1.245.150:7081/v1/otp/send
+  genericOtpUrl: http://10.1.245.150:7081/v1/otp/generic
 
 COOP_INTERNAL:
   coopFtUrl: http://10.1.245.150:7081/v1/cbo/

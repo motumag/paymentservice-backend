@@ -1,16 +1,18 @@
 package com.motuma.paymentserviceesb.payment.dto;
 
-import com.motuma.paymentserviceesb.payment.configs.PaymentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PaymentMethodStatusDto {
-    private String paymentMethodCode;
-    private PaymentStatus paymentStatus;
+public class GenericSmsResponse {
+    private String message;
+    private String timeStamp;
+    private int statusCode;
+    private HttpStatus status;
 }

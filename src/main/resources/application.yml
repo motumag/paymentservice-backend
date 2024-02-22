@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: ${ACTIVE_PROFILE:prod}
+    active: ${ACTIVE_PROFILE:uat}
   datasource:
     url: jdbc:postgresql://${POSTGRES_SQL_HOST}:${POSTGRES_SQL_PORT}/${POSTGRES_SQL_DB}
     username: ${POSTGRES_SQL_USERNAME}
@@ -50,6 +50,7 @@ SEND_OTP_CONFIG:
 ACE:
   sendOtpUrl: ${APPCONNECT_URL.otpUrl}
   phoneByAccount: ${APPCONNECT_URL.phoneEnqByAccNo}
+  sendGenericOtpUrl: ${APPCONNECT_URL.genericOtpUrl}
 
 COOP_INTERNAL_FT:
   coopFtUrl: ${COOP_INTERNAL.coopFtUrl}
