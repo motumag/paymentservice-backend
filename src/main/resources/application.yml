@@ -21,13 +21,12 @@ spring:
     name: PaymentServices
 
 server:
-  port: ${SERVER_PORT:8080}
+  port: ${SERVER_PORT}
   ssl:
-    key-store: classpath:paymentcoopkeystore.jks
-    key-store-password: ${KEY_STORE_PASSWORD}
-    key-alias: ${KEY_ALIAS}
-    key-password: ${KEY_PASSWORD}
-
+    key-store-type: PKCS12
+    key-store: classpath:pskeystore.p12
+    key-store-password: momo@123
+    key-alias: momo
 
 #Ebirr constant values and configuration
 EBIRR_CONFIG:

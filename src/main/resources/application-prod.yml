@@ -8,22 +8,17 @@ POSTGRES_SQL_DB: pservicedb
 #Server port
 SERVER_PORT: 9094
 ACTIVE_PROFILE: prod
-
-# for ssl keys
-KEY_STORE_PASSWORD: qazwsx@123
-KEY_ALIAS: paymentservice
-KEY_PASSWORD: qazwsx@123
-
 #Ebirr configuration
 EBIRR:
-  url: https://testpayments.ebirr.com/asm
+  url: https://payments.ebirr.com/asm
   schemaVersion: 1.0
   channelName: WEB
   serviceName: API_PURCHASE
-  merchantUid: M1040033
+  merchantUid: M0004225
+#  merchantUid: 8118039
   paymentMethod: MWALLET_ACCOUNT
-  apiKey: API-10618773
-  apiUserId: 10000008
+  apiKey: API-61937745AHX
+  apiUserId: 10009074
   currency: ETB
   description: ebirr-payment
 #For OTP Configuration

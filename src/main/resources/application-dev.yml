@@ -9,10 +9,6 @@ POSTGRES_SQL_DB: pservicedb
 SERVER_PORT: 9094
 ACTIVE_PROFILE: dev
 
-KEY_STORE_PASSWORD: qazwsx@123
-KEY_ALIAS: paymentservice
-KEY_PASSWORD: qazwsx@123
-
 EBIRR:
   url: https://testpayments.ebirr.com/asm
   schemaVersion: 1.0

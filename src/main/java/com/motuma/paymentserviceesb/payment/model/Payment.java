@@ -39,5 +39,7 @@ public class Payment {
     private String ebirrRejectedOrderId;
     private String paymentCompletionTime;
     private String paymentSourceName;
+
+
 }
 

@@ -138,7 +138,6 @@ public class CoopInternalTransactionServiceImpl implements CoopInternalTransacti
             JSONObject jsonObject = new JSONObject(responseBody);
             CoopInternalTransactionResponse.CoopInternalTransactionResponseBuilder builder = CoopInternalTransactionResponse.builder();
             JSONObject paymentServiceResponse = jsonObject.getJSONObject("PaymentServiceResponse");
-
             JSONObject esbStatus = paymentServiceResponse.getJSONObject("ESBStatus");
             String responseCode = esbStatus.getString("responseCode");
 

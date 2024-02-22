@@ -3,7 +3,6 @@ package com.motuma.paymentserviceesb.payment.controller;
 import com.motuma.paymentserviceesb.payment.dto.EbirrPaymentResponse;
 import com.motuma.paymentserviceesb.payment.dto.EbirrRequestDto;
 import com.motuma.paymentserviceesb.payment.service.EbirrService;
-import com.motuma.paymentserviceesb.security.payload.AuthenticationResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,7 +22,12 @@ public class EbirrController {
     @PostMapping("/ebirr")
     public ResponseEntity<EbirrPaymentResponse> createEbirrTransactionPayment(@Valid @RequestBody EbirrRequestDto ebirrRequestDto){
         try {
-            return ResponseEntity.ok(ebirrService.createEbirrTransaction(ebirrRequestDto));
+            EbirrPaymentResponse response = ebirrService.createEbirrTransaction(ebirrRequestDto);
+            if (response.getStatusCode() == HttpStatus.OK.value()) {
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.badRequest().body(response);
+            }
         }catch (Exception e){
             System.out.println("Controller exception: "+e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(

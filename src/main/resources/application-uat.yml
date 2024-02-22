@@ -10,9 +10,9 @@ SERVER_PORT: 9094
 ACTIVE_PROFILE: uat
 
 # for ssl keys
-KEY_STORE_PASSWORD: qazwsx@123
-KEY_ALIAS: paymentservice
-KEY_PASSWORD: qazwsx@123
+#KEY_STORE_PASSWORD: qazwsx@123
+#KEY_ALIAS: paymentservice
+#KEY_PASSWORD: qazwsx@123
 
 #Ebirr configuration
 EBIRR:
