@@ -1,6 +1,7 @@
 package com.motuma.paymentserviceesb.payment.controller;
 
 import com.motuma.paymentserviceesb.payment.dto.CoopInternalTransactionResponse;
+import com.motuma.paymentserviceesb.payment.dto.EbirrPaymentResponse;
 import com.motuma.paymentserviceesb.payment.dto.OtpSendDto;
 import com.motuma.paymentserviceesb.payment.dto.OtpSendResonse;
 import com.motuma.paymentserviceesb.payment.service.OtpSendService;
@@ -22,7 +23,12 @@ public class SendOtpController {
     @PostMapping("/send")
     public ResponseEntity<OtpSendResonse> sendOtp(@RequestBody OtpSendDto otpSendDto){
         try{
-            return ResponseEntity.ok(otpSendService.sendOtpToCustomerAccountNumber(otpSendDto));
+            OtpSendResonse response = otpSendService.sendOtpToCustomerAccountNumber(otpSendDto);
+            if (response.getStatusCode() == HttpStatus.OK.value()) {
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.badRequest().body(response);
+            }
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     OtpSendResonse.builder()
