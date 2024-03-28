@@ -39,3 +39,5 @@ APPCONNECT_URL:
 
 COOP_INTERNAL:
   coopFtUrl: http://10.1.245.150:7081/v1/cbo/
+SOUQPASS_REPAYMENT:
+  souqpassRePaymentFTUrl: http://10.1.245.150:7081/v1/cbo/

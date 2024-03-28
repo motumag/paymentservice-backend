@@ -1,13 +1,12 @@
 package com.motuma.paymentserviceesb.payment.service.impl;
 
-import com.motuma.paymentserviceesb.payment.dto.CoopTransactionDto;
 import com.motuma.paymentserviceesb.payment.dto.CoopInternalTransactionResponse;
-import com.motuma.paymentserviceesb.payment.model.OtpSend;
+import com.motuma.paymentserviceesb.payment.dto.SouqPassLoanDispDto;
+import com.motuma.paymentserviceesb.payment.dto.SouqPassLoanDispResponse;
 import com.motuma.paymentserviceesb.payment.model.Payment;
 import com.motuma.paymentserviceesb.payment.repository.PaymentCategoryRepository;
 import com.motuma.paymentserviceesb.payment.repository.PaymentRepository;
-import com.motuma.paymentserviceesb.payment.repository.SendOtpRepository;
-import com.motuma.paymentserviceesb.payment.service.CoopInternalTransactionService;
+import com.motuma.paymentserviceesb.payment.service.SouqPassLoanDispursementService;
 import com.motuma.paymentserviceesb.security.config.CurrentLoggedInUser;
 import com.motuma.paymentserviceesb.security.model.User;
 import com.motuma.paymentserviceesb.security.repository.UserRepository;
@@ -30,65 +29,38 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class CoopInternalTransactionServiceImpl implements CoopInternalTransactionService {
+public class SouqPassLoanDispServiceImp implements SouqPassLoanDispursementService {
     private final PaymentRepository paymentRepository;
     private final PaymentCategoryRepository paymentCategoryRepository;
     private final UserRepository userRepository;
-    private final SendOtpRepository sendOtpRepository;
-    @Value("${COOP_INTERNAL_FT.coopFtUrl}")
-    private String coopFundTransferUrl;
+    @Value("${SOUQPASS_REPAYMENT.souqpassRePaymentFTUrl}")
+    private String souqpassLoanDispUrl;
 
     @Override
     @Transactional
-    public CoopInternalTransactionResponse coopFundTransferInitiate(CoopTransactionDto coopRequest) {
+    public SouqPassLoanDispResponse initiateLoanDisp(SouqPassLoanDispDto dispRequest) {
         try {
-            if (paymentRepository.existsByOrderId(coopRequest.getOfsMessageId())) {
+            if (paymentRepository.existsByOrderId(dispRequest.getOfsMessageId())) {
                 throw new RuntimeException("Transaction already exist with this messageId");
             }
             if (!paymentCategoryRepository.existsByPaymentCategoryCodeAndPaymentSourceNameIgnoreCase(
-                    coopRequest.getPaymentMethodCode(),
-                    coopRequest.getPaymentSourceName())) {
+                    dispRequest.getPaymentMethodCode(),
+                    dispRequest.getPaymentSourceName())) {
                 throw new RuntimeException("Please, check your paymentCategoryCode and PaymentSourceName");
             }
-            OtpSend otpSendConfirmation = sendOtpRepository.findOtpSendsByOtpNumberIgnoreCase(coopRequest.getOtpNumber());
-
-            if (otpSendConfirmation == null) {
-                throw new RuntimeException("OTP number is not found");
-            }
-            String otpNumberFromDb = otpSendConfirmation.getOtpNumber();
-            String accountNumberFromOtp = otpSendConfirmation.getAccountNumber();
-            String otpStatus = otpSendConfirmation.getStatus();
-            System.out.println("OPT STATUS IS : "+otpStatus);
-
-            if (!otpNumberFromDb.equals(coopRequest.getOtpNumber())) {
-                throw new RuntimeException("Otp Mismatch");
-            }
-
-            if (!accountNumberFromOtp.equals(coopRequest.getDebitAccountNumber())) {
-                throw new RuntimeException("Account Number Mismatch");
-            }
-            switch (otpStatus) {
-                case "Confirmed" -> throw new RuntimeException("The OTP you provided has already been used");
-                case "Failure" -> throw new RuntimeException("Forbidden to use this OTP");
-                case "Success" -> {
-                    otpSendConfirmation.setStatus("Confirmed");
-                    sendOtpRepository.save(otpSendConfirmation);
-                }
-            }
-
             CurrentLoggedInUser currentLoggedInUser = new CurrentLoggedInUser();
             Payment coopPaymentDb = new Payment();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
             LocalDateTime currentDateTime = LocalDateTime.now();
             String timestampValue = currentDateTime.format(formatter);
-            //save the request to db here
-            coopPaymentDb.setOrderId(coopRequest.getOfsMessageId());
+
+            coopPaymentDb.setOrderId(dispRequest.getOfsMessageId());
             coopPaymentDb.setTimestamp(timestampValue);
-            coopPaymentDb.setDebitAccountNumber(coopRequest.getDebitAccountNumber());
-            coopPaymentDb.setAmount(coopRequest.getDebitAmount());
+            coopPaymentDb.setCreditAccountNumber(dispRequest.getCreditAccountNumber());
+            coopPaymentDb.setAmount(dispRequest.getAmount());
             coopPaymentDb.setPaymentMethod("COOP_FT");
-            coopPaymentDb.setPaymentServiceCode(coopRequest.getPaymentMethodCode());
-            coopPaymentDb.setPaymentSourceName(coopRequest.getPaymentSourceName());
+            coopPaymentDb.setPaymentServiceCode(dispRequest.getPaymentMethodCode());
+            coopPaymentDb.setPaymentSourceName(dispRequest.getPaymentSourceName());
             coopPaymentDb.setStatus("Pending");
 
             Optional<User> userOptional = userRepository.findByUserName(currentLoggedInUser.getCurrentUserSub());
@@ -100,46 +72,44 @@ public class CoopInternalTransactionServiceImpl implements CoopInternalTransacti
                 throw new RuntimeException("Something wrong with logged in user");
             }
             paymentRepository.save(coopPaymentDb);
-
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            String ftUrl = coopFundTransferUrl;
+            String dispUrl = souqpassLoanDispUrl;
 
             JSONObject requestPayload = new JSONObject();
-            JSONObject paymentServiceTransferRequest = new JSONObject();
+            JSONObject souqPassDispRequest = new JSONObject();
             JSONObject esbHeader = new JSONObject();
             JSONObject ofsFunction = new JSONObject();
             JSONObject fundsTransferActRMMTType = new JSONObject();
             //TODO: The ESBHeader part
-            esbHeader.put("serviceCode", coopRequest.getServiceCode());
-            esbHeader.put("channel", coopRequest.getChannel());
-            esbHeader.put("Service_name", coopRequest.getServiceName());
-            esbHeader.put("Message_Id", coopRequest.getOfsMessageId());
+            esbHeader.put("serviceCode", dispRequest.getServiceCode());
+            esbHeader.put("channel", dispRequest.getChannel());
+            esbHeader.put("Service_name", dispRequest.getServiceName());
+            esbHeader.put("Message_Id", dispRequest.getOfsMessageId());
             //TODO: The Ofs part
-            ofsFunction.put("messageId", coopRequest.getOfsMessageId());
+            ofsFunction.put("messageId", dispRequest.getOfsMessageId());
             //TODO: The FUNDSTRANSFERACTRMMTType part
-            fundsTransferActRMMTType.put("DebitAmount", coopRequest.getDebitAmount());
-            fundsTransferActRMMTType.put("DebitAccount", coopRequest.getDebitAccountNumber());
-            fundsTransferActRMMTType.put("CreditAccount", coopRequest.getCreditAccountNumber());
+            fundsTransferActRMMTType.put("creditAccountNumber", dispRequest.getCreditAccountNumber());
+            fundsTransferActRMMTType.put("amount", dispRequest.getAmount());
 
-            paymentServiceTransferRequest.put("ESBHeader", esbHeader);
-            paymentServiceTransferRequest.put("OfsFunction", ofsFunction);
-            paymentServiceTransferRequest.put("FUNDSTRANSFERACTRMMTType", fundsTransferActRMMTType);
-            requestPayload.put("PaymentServiceTransferRequest", paymentServiceTransferRequest);
+            souqPassDispRequest.put("ESBHeader", esbHeader);
+            souqPassDispRequest.put("OfsFunction", ofsFunction);
+            souqPassDispRequest.put("FUNDSTRANSFERACTRMMTType", fundsTransferActRMMTType);
+            requestPayload.put("SouqPassDispRequest", souqPassDispRequest);
             String requestBody = requestPayload.toString();
             System.out.println("Request body: " + requestBody);
             HttpEntity<String> requestEntityCoopFt = new HttpEntity<>(requestBody, headers);
-            ResponseEntity<String> responseEntity = restTemplate.exchange(ftUrl, HttpMethod.POST, requestEntityCoopFt, String.class);
-
+            ResponseEntity<String> responseEntity = restTemplate.exchange(dispUrl, HttpMethod.POST, requestEntityCoopFt, String.class);
             String responseBody = responseEntity.getBody();
-            System.out.println("response body is: "+responseBody);
+            System.out.println("response body is: " + responseBody);
+
             JSONObject jsonObject = new JSONObject(responseBody);
-            CoopInternalTransactionResponse.CoopInternalTransactionResponseBuilder builder = CoopInternalTransactionResponse.builder();
-            JSONObject paymentServiceResponse = jsonObject.getJSONObject("PaymentServiceResponse");
+            SouqPassLoanDispResponse.SouqPassLoanDispResponseBuilder builder = SouqPassLoanDispResponse.builder();
+
+            JSONObject paymentServiceResponse = jsonObject.getJSONObject("SouqpassDispResponse");
             JSONObject esbStatus = paymentServiceResponse.getJSONObject("ESBStatus");
             String responseCode = esbStatus.getString("responseCode");
-
             if (paymentServiceResponse.has("Status")) {
                 JSONObject statusObject = paymentServiceResponse.getJSONObject("Status");
                 if (statusObject.has("successIndicator") && statusObject.getString("successIndicator").equals("Success")) {
@@ -191,7 +161,9 @@ public class CoopInternalTransactionServiceImpl implements CoopInternalTransacti
             }
             return builder.build();
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             throw new RuntimeException(e.getMessage());
+
         }
     }
 }
