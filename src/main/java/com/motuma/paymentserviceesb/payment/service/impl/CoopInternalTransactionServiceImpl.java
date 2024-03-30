@@ -35,7 +35,7 @@ public class CoopInternalTransactionServiceImpl implements CoopInternalTransacti
     private final PaymentCategoryRepository paymentCategoryRepository;
     private final UserRepository userRepository;
     private final SendOtpRepository sendOtpRepository;
-    @Value("${COOP_INTERNAL_FT.coopFtUrl}")
+    @Value("${COOP_INTERNAL_FT.dispUrlSouq}")
     private String coopFundTransferUrl;
 
     @Override
